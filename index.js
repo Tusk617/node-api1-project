@@ -30,4 +30,20 @@ server.post("/api/users", (req, res) => {
     res.status(201).json(userInformation)
 })
 
+server.get("/api/users/:id", (req, res) => {
+    let id = Number(req.params.id)
+
+    users = users.filter((user) => user.id === id);
+
+    res.status(202).json(users);
+})
+
+server.delete("/api/users/:id", (req, res) => {
+    const id = Number(req.params.id)
+
+    users = users.filter((user) => user.id !== id);
+
+    res.status(200).json(users);
+})
+
 server.listen(8000, () => console.log("API is cool"))
