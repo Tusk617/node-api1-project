@@ -13,21 +13,28 @@ let users = [
     }
 ]
 
+// let users = undefined;
+
 server.get("/", (req, res) => {
-    res.json({ api: "Hello World!" });
+    res.json(users);
 })
 
 server.get("/api/users", (req, res) => {
     //calling the users array
-    res.json(users);
+    
+    if (!users) {
+        res.status(500).json({errorMessage: "There was an error while saving the user to the database"})
+    } else res.json(users);
 })
 
 server.post("/api/users", (req, res) => {
     const userInformation = req.body;
-
     users.push(userInformation);
 
-    res.status(400).json(userInformation)
+    if (userInformation.name === undefined || userInformation.bio === undefined) {
+        res.status(400).json({ errorMessage: "Please provide name and bio for the user."})
+    } else res.status(201).json(userInformation)
+
 })
 
 server.get("/api/users/:id", (req, res) => {
@@ -36,6 +43,10 @@ server.get("/api/users/:id", (req, res) => {
     let filteredUsers = users;
 
     filteredUsers = filteredUsers.filter((user) => user.id === id);
+
+    if (!filteredUsers[id]) {
+        res.status(404).json({message: "The user with the specified ID does not exist."})
+    }
 
     res.status(202).json(filteredUsers);
 })
