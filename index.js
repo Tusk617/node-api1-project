@@ -7,7 +7,7 @@ server.use(express.json());
 // creating the users array, which will be called later in a get request
 let users = [
     {
-        id: 1,
+        id: 0,
         name: "CoolGuy7",
         bio: "Just a cool guy, what can I say?"
     }
@@ -46,6 +46,18 @@ server.delete("/api/users/:id", (req, res) => {
     users = users.filter((user) => user.id !== id);
 
     res.status(200).json(users);
+})
+
+server.patch("/api/users/:id", (req, res) => {
+    const id = Number(req.params.id);
+    const userName = req.body.name;
+
+    console.log("Before Update: ", users[id])
+    users[id].name = userName;
+    users[id].bio = req.body.bio;
+    console.log("After Update: ", users[id])
+
+    res.json(users);
 })
 
 server.listen(8000, () => console.log("API is cool"))
