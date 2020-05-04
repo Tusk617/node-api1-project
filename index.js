@@ -27,15 +27,17 @@ server.post("/api/users", (req, res) => {
 
     users.push(userInformation);
 
-    res.status(201).json(userInformation)
+    res.status(400).json(userInformation)
 })
 
 server.get("/api/users/:id", (req, res) => {
     let id = Number(req.params.id)
 
-    users = users.filter((user) => user.id === id);
+    let filteredUsers = users;
 
-    res.status(202).json(users);
+    filteredUsers = filteredUsers.filter((user) => user.id === id);
+
+    res.status(202).json(filteredUsers);
 })
 
 server.delete("/api/users/:id", (req, res) => {
