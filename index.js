@@ -8,9 +8,14 @@ server.use(express.json())
 
 let users = [
     {
-        id: 1,
+        id: 0,
         name: "Andrew W.K",
         bio: "Unnoficial Ambassador of partying"
+    },
+    {
+        id: 1,
+        name: "Scooby Doo",
+        bio: "A talking dog! Whacky!"
     }
 ]
 
@@ -47,16 +52,37 @@ server.post("/api/users", (req, res) => {
 })
 
 server.delete("/api/users/:id", (req, res) => {
-    const id = req.params.id;
+    let userId = Number(req.params.id);
+    // let filteredUsers = users;
 
-    users = users.filter((user) => user.id !== Number(id));
+    users = users.filter((user) => user.id !== userId);
 
-    if (users === undefined) {
+    if (users[userId] === undefined) {
         res.status(404).json({error: "User cannot be found"})
     } else if (!users) {
         res.status(500).json({error: "The user could not be removed"})
     } else {
         // console.log(filteredUsers)
+        res.status(200).json(users[userId])
+    }
+
+})
+
+server.put("/api/users/:id", (req, res) => {
+    const id = req.params.id;
+
+    console.log("Before Update: ", users[id])
+    users[id].name = req.body.name;
+    users[id].bio = req.body.bio;
+    console.log("After Update: ", users[id])
+
+    if (users === undefined) {
+        res.status(404).json({message: "The user with the specified ID does not exist."})
+    } else if (!users[id].name || !users[id].bio) {
+        res.status(400).json({errorMessage: "Please provide name and bio for the user."})
+    } else if (!users) {
+        res.status(500).json({errorMessage: "The user information could not be modified."})
+    } else {
         res.status(200).json(users[id])
     }
 
