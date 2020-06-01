@@ -14,6 +14,7 @@ let users = [
     }
 ]
 
+
 //functions
 server.get("/api/users", (req, res) => {
 
@@ -44,6 +45,23 @@ server.post("/api/users", (req, res) => {
         res.status(500).json({error: "There was an error saving the user"})
     } else return res.status(201).json(users)
 })
+
+server.delete("/api/users/:id", (req, res) => {
+    const id = req.params.id;
+
+    users = users.filter((user) => user.id !== Number(id));
+
+    if (users === undefined) {
+        res.status(404).json({error: "User cannot be found"})
+    } else if (!users) {
+        res.status(500).json({error: "The user could not be removed"})
+    } else {
+        // console.log(filteredUsers)
+        res.status(200).json(users[id])
+    }
+
+})
+
 
 //listen for incoming requests
 const port = 8000;
