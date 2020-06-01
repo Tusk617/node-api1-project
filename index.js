@@ -16,7 +16,10 @@ let users = [
 
 //functions
 server.get("/api/users", (req, res) => {
-    res.status(200).json(users)
+
+    if (!users) {
+        return res.status(500).json({errorMessage: "The users information could not be retrieved."})
+    } else return res.status(200).json(users)
 })
 
 //listen for incoming requests
