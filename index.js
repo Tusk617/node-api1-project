@@ -33,6 +33,18 @@ server.get("/api/users/:id", (req, res) => {
     } else return res.status(200).json(filteredUsers);
 })
 
+server.post("/api/users", (req, res) => {
+    const person = req.body;
+
+    users.push(person);
+
+    if (!person.name || !person.bio) {
+        res.status(400).json({error: "Please provide a name and bio for the user"})
+    } else if (!users) {
+        res.status(500).json({error: "There was an error saving the user"})
+    } else return res.status(201).json(users)
+})
+
 //listen for incoming requests
 const port = 8000;
 
