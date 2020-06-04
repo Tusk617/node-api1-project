@@ -1,74 +1,95 @@
 const express = require("express");
+const shortid = require("shortid");
 
+
+//create a server
 const server = express();
+server.use(express.json())
 
-server.use(express.json());
-
-// creating the users array, which will be called later in a get request
 let users = [
     {
         id: 0,
-        name: "CoolGuy7",
-        bio: "Just a cool guy, what can I say?"
+        name: "Andrew W.K",
+        bio: "Unnoficial Ambassador of partying"
+    },
+    {
+        id: 1,
+        name: "Scooby Doo",
+        bio: "A talking dog! Whacky!"
     }
 ]
 
-// let users = undefined;
 
-server.get("/", (req, res) => {
-    res.json(users);
-})
-
+//functions
 server.get("/api/users", (req, res) => {
-    //calling the users array
-    
+
     if (!users) {
-        res.status(500).json({errorMessage: "There was an error while saving the user to the database"})
-    } else res.json(users);
-})
-
-server.post("/api/users", (req, res) => {
-    const userInformation = req.body;
-    users.push(userInformation);
-
-    if (userInformation.name === undefined || userInformation.bio === undefined) {
-        res.status(400).json({ errorMessage: "Please provide name and bio for the user."})
-    } else res.status(201).json(userInformation)
-
+        return res.status(500).json({errorMessage: "The users information could not be retrieved."})
+    } else return res.status(200).json(users)
 })
 
 server.get("/api/users/:id", (req, res) => {
-    let id = Number(req.params.id)
+    let userId = Number(req.params.id);
 
-    let filteredUsers = users;
+    const filteredUsers = users.filter((user) => user.id === userId);
+    if (filteredUsers[0] === undefined) {
+        return res.status(404).json({error: "User does not exist"})
+    } else if (!users) {
+        return res.status(500).json({error: "User info could not be retrieved"})
+    } else return res.status(200).json(filteredUsers);
+})
 
-    filteredUsers = filteredUsers.filter((user) => user.id === id);
+server.post("/api/users", (req, res) => {
+    const person = req.body;
 
-    if (!filteredUsers[id]) {
-        res.status(404).json({message: "The user with the specified ID does not exist."})
-    }
+    users.push(person);
 
-    res.status(202).json(filteredUsers);
+    if (!person.name || !person.bio) {
+        res.status(400).json({error: "Please provide a name and bio for the user"})
+    } else if (!users) {
+        res.status(500).json({error: "There was an error saving the user"})
+    } else return res.status(201).json(users)
 })
 
 server.delete("/api/users/:id", (req, res) => {
-    const id = Number(req.params.id)
+    let userId = Number(req.params.id);
+    // let filteredUsers = users;
 
-    users = users.filter((user) => user.id !== id);
+    users = users.filter((user) => user.id !== userId);
 
-    res.status(200).json(users);
+    if (users[userId] === undefined) {
+        res.status(404).json({error: "User cannot be found"})
+    } else if (!users) {
+        res.status(500).json({error: "The user could not be removed"})
+    } else {
+        // console.log(filteredUsers)
+        res.status(200).json(users[userId])
+    }
+
 })
 
-server.patch("/api/users/:id", (req, res) => {
-    const id = Number(req.params.id);
-    const userName = req.body.name;
+server.put("/api/users/:id", (req, res) => {
+    const id = req.params.id;
 
     console.log("Before Update: ", users[id])
-    users[id].name = userName;
+    users[id].name = req.body.name;
     users[id].bio = req.body.bio;
     console.log("After Update: ", users[id])
 
-    res.json(users);
+    if (users === undefined) {
+        res.status(404).json({message: "The user with the specified ID does not exist."})
+    } else if (!users[id].name || !users[id].bio) {
+        res.status(400).json({errorMessage: "Please provide name and bio for the user."})
+    } else if (!users) {
+        res.status(500).json({errorMessage: "The user information could not be modified."})
+    } else {
+        res.status(200).json(users[id])
+    }
+
 })
 
-server.listen(8000, () => console.log("API is cool"))
+
+//listen for incoming requests
+const port = 8000;
+
+server.listen(port, () => console.log(`Server is running on ${port}`))
